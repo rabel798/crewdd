@@ -70,7 +70,7 @@ def upload_folder_to_github(source_folder, github_url, username, token):
                     repo.index.add([rel_path])
                     repo.index.commit(f"Added file: {rel_path}")
                     print(f"[{index}/{total_items}] Committed file: {rel_path}")
-                    time.sleep(0.65)
+                    time.sleep(1.95)
 
                 # Push after each commit
                 if index == total_items:  # Only push on the last item
