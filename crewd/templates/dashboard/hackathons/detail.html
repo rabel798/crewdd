@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <h1>{{ hackathon.title }}</h1>
+            <p class="text-muted">Status: <span class="badge bg-{{ hackathon.status|status_color }}">{{ hackathon.status|title }}</span></p>
+            
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Description</h5>
+                    <p class="card-text">{{ hackathon.description|linebreaks }}</p>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Details</h5>
+                    <ul class="list-unstyled">
+                        <li><strong>Start Date:</strong> {{ hackathon.start_date|date:"F j, Y, g:i a" }}</li>
+                        <li><strong>End Date:</strong> {{ hackathon.end_date|date:"F j, Y, g:i a" }}</li>
+                        <li><strong>Registration Deadline:</strong> {{ hackathon.registration_deadline|date:"F j, Y, g:i a" }}</li>
+                        <li><strong>Max Team Size:</strong> {{ hackathon.max_team_size }}</li>
+                        {% if hackathon.prize_pool %}
+                        <li><strong>Prize Pool:</strong> ${{ hackathon.prize_pool }}</li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Technologies</h5>
+                    <div class="mt-2">
+                        {% for tag in hackathon.get_tags_list %}
+                        <span class="badge bg-secondary me-1">{{ tag }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Register Your Team</h5>
+                    
+                    {% if timezone.now > hackathon.registration_deadline %}
+                    <div class="alert alert-danger">
+                        Registration deadline has passed.
+                    </div>
+                    {% elif is_registered %}
+                    <div class="alert alert-success">
+                        Your team is already registered for this hackathon.
+                    </div>
+                    {% else %}
+                    <form method="post" action="{% url 'projects:register_for_hackathon' hackathon.id %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="team" class="form-label">Select Team</label>
+                            <select class="form-select" id="team" name="team" required>
+                                <option value="">Choose a team...</option>
+                                {% for group in user_groups %}
+                                <option value="{{ group.id }}">{{ group.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Register Team</button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h5 class="card-title">Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{% url 'projects:hackathon_list' %}" class="text-decoration-none">← Back to Hackathons</a></li>
+                        <li><a href="{% url 'projects:my_hackathons' %}" class="text-decoration-none">View My Hackathons</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
